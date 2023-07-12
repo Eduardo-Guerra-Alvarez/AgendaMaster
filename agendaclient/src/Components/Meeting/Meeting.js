@@ -4,9 +4,8 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useState, useEffect, useReducer } from 'react';
 import './Meeting.css'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faXmark } from '@fortawesome/free-solid-svg-icons'
-
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
 function Meeting () {
     const [events, setEvents] = useState([])
@@ -15,7 +14,6 @@ function Meeting () {
         return {
             ...state,
             [event.name]: event.value
-
         }
     }
 
@@ -48,8 +46,12 @@ function Meeting () {
 
     const showModalEvent = () => {
         document.getElementById("modalEvent").style.display = "block"
+        closeModal()
     }
     
+    const getEvents = () => {
+        console.log("Events")
+    }
 
     const addEvent = event => {
         event.preventDefault();
@@ -60,8 +62,8 @@ function Meeting () {
 
         const updateEvents = [...events, newEvent];
         setEvents(updateEvents)
+        document.getElementById("title").value = ""
         closeModalEvent();
-        closeModal();
     }
 
     const handleChange = event => {
@@ -69,20 +71,11 @@ function Meeting () {
             name: event.target.name,
             value: event.target.value
         })
-
     }
 
-    const listEvents = () => {
-        return (
-            <ul>
-                {
-                    events.map((event, id) => {
-                        <li key={id}>{event.title}</li>
-                    })
-                }
-            </ul>
-        )
-    }
+    useEffect(() => {
+        getEvents();
+    }, [])
 
     return(
         <>
@@ -96,27 +89,34 @@ function Meeting () {
                             <h2>Eventos</h2>
                         </div>
                         <div className="modal-body">
-                            <table>
-                                <tr>
-                                    <td>Titulo</td>
-                                    <td>Fecha Inicio</td>
-                                </tr>
-                                <tr>
+                            <div className="wrap-table">
+                                <table className="tableEvents">
+                                    <tr>
+                                        <th>Titulo</th>
+                                        <th>Fecha Inicio</th>
+                                        <th>Participantes</th>
+                                    </tr>
                                     {
                                         events.map(({title, start}) => (
                                             <tr>
                                                 <td>{title}</td>
                                                 <td>{start}</td>
+                                                <td>
+                                                    <ul>
+                                                        <li>Luis Jimenez</li>
+                                                        <li>Mario Ramirez</li>
+                                                        <li>Juan</li>
+                                                    </ul>
+                                                </td>
                                             </tr>
                                         ))
                                     } 
-                                    <td></td>
-                                </tr>
-                            </table>
+                                </table>
+                            </div>
                         </div>
                         <div className="modal-footer">
                             <button onClick={showModalEvent} id="createEvent">Crear evento</button>
-                            <button onClick={closeModal}>Close</button>
+                            <button onClick={closeModal}>Cerrar</button>
                         </div>
                     </div>
                 </div>
@@ -133,14 +133,14 @@ function Meeting () {
                                 <form action="" onSubmit={addEvent} id="formAddEvent">
                                     <div>
                                         <label htmlFor="">Titulo</label>
-                                        <input type="text" name="title" onChange={handleChange}/>
+                                        <input id="title" type="text" name="title" placeholder="Please type a title" onChange={handleChange}/>
                                     </div>
                                 </form>
                             </div>
                         </div>
                         <div className="modal-footer">
                             <button form="formAddEvent">Crear</button>
-                            <button onClick={closeModalEvent}>Close</button>
+                            <button onClick={closeModalEvent}>Cerrar</button>
                         </div>
                     </div>
                 </div>

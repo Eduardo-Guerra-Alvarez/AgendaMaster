@@ -12,7 +12,7 @@ function Menu() {
     return(
         <>
         <header>
-            <div className="logo">Icon</div>
+            <div className="logo">Agen<span>da.com</span></div>
             <div className="hamburger" onClick={hamburger}>
                 <div className="line"></div>
                 <div className="line"></div>
