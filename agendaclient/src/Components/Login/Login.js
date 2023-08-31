@@ -10,7 +10,7 @@ function Login () {
                 <h1>Login</h1>
                     <form action="">
                         <div>
-                            <label>Usuario</label>
+                            <label>Email</label>
                             <input type="email" placeholder="Introduce un correo electronico" />
                         </div>
                         <div>

@@ -1,0 +1,6 @@
+- [x] Login
+- [x] Register
+- [] Add new event
+- [] Update new event
+- [] Delete new event
+- [] See all users

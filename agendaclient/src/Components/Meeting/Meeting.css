@@ -72,7 +72,8 @@
 .wrap-table {
     margin: 30px 20px 30px 20px;
     border-radius: 10px;
-    overflow: hidden;
+    max-height: 400px;
+    overflow: scroll;
 }
 
 .tableEvents {
@@ -81,7 +82,7 @@
 }
 
 .tableEvents th {
-    background-color: #6c7ae0;
+    background-color: #1a252f;
     color: white;
 }
 
@@ -138,7 +139,7 @@
 #formAddEvent label {
     display: block;
     margin-bottom: 15px;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 
 #formAddEvent input {
@@ -148,4 +149,10 @@
     border-bottom: 1px solid black;
     font-size: 1rem;
     padding-left: 10px;
+}
+
+.selectUsers {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
 }

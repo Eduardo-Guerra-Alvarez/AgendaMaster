@@ -6,8 +6,16 @@ import { useState, useEffect, useReducer } from 'react';
 import './Meeting.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import axios from'axios'
+import { useQuery } from '@tanstack/react-query'
 
 function Meeting () {
+
+    const meetingsApi = axios.create({
+        baseURL: 'http://localhost:4000/api'
+    })
+
+
     const [events, setEvents] = useState([])
     const [dateTime, setDateTime] = useState("")
     const formReducer = (state, event) => {
@@ -16,8 +24,22 @@ function Meeting () {
             [event.name]: event.value
         }
     }
-
+    
+    // using formReducer
     const [formData, setFormData] = useReducer(formReducer, {})
+    
+    const getEvents = async () => {
+        const meetings = await meetingsApi.get('/schedule')
+    }
+
+    const { isLoading, data, isError, error } = useQuery({
+        queryKey: ['meetings'],
+        queryFn: getEvents
+    })
+
+    // Checking if is loading or get an error
+    if (isLoading) return <div>Loading...</div>
+    else if (isError) return <div>Error: {error.message}</div>
 
     // Get the modal
     let modal = document.getElementById("myModal")
@@ -49,20 +71,19 @@ function Meeting () {
         closeModal()
     }
     
-    const getEvents = () => {
-        console.log("Events")
-    }
 
     const addEvent = event => {
         event.preventDefault();
         const newEvent = {
             title: formData.title,
+            url: formData.url,
             start: dateTime
         }
 
         const updateEvents = [...events, newEvent];
         setEvents(updateEvents)
         document.getElementById("title").value = ""
+        document.getElementById("url").value = ""
         closeModalEvent();
     }
 
@@ -73,12 +94,13 @@ function Meeting () {
         })
     }
 
-    useEffect(() => {
+    /*useEffect(() => {
         getEvents();
-    }, [])
+    }, [])*/
 
     return(
         <>
+            <div>{JSON.stringify(data)}</div>
             <div className="container-meeting">
                 <div id="myModal" className="modal">
                     <div className="modal-content">
@@ -94,13 +116,15 @@ function Meeting () {
                                     <tr>
                                         <th>Titulo</th>
                                         <th>Fecha Inicio</th>
+                                        <th>URL</th>
                                         <th>Participantes</th>
                                     </tr>
                                     {
-                                        events.map(({title, start}) => (
+                                        events.map(({title, start, url}) => (
                                             <tr>
                                                 <td>{title}</td>
                                                 <td>{start}</td>
+                                                <td>{url}</td>
                                                 <td>
                                                     <ul>
                                                         <li>Luis Jimenez</li>
@@ -134,6 +158,18 @@ function Meeting () {
                                     <div>
                                         <label htmlFor="">Titulo</label>
                                         <input id="title" type="text" name="title" placeholder="Please type a title" onChange={handleChange}/>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="">URL Junta</label>
+                                        <input id="url" name="url" type="" placeholder="Please type URL meeting" onChange={handleChange}/>
+                                    </div>
+                                    <div>
+                                        <label>Selecciona participantes</label>
+                                        <select id="users" name="users" className="selectUsers" multiple>
+                                            <option value="">Luis</option>
+                                            <option value="">Mario</option>
+                                            <option value="">Jimeno</option>
+                                        </select>
                                     </div>
                                 </form>
                             </div>
