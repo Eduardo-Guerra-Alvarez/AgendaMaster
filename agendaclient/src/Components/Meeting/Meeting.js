@@ -2,39 +2,25 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
-import { useState, useEffect, useReducer } from 'react';
+import { useState } from 'react';
 import './Meeting.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import axios from'axios'
 import { useQuery } from '@tanstack/react-query'
+import { getEvents } from '../../Api/meedingApi'
+import MeetingForm from './MeetingForm'
+import  moment from 'moment'
 
 function Meeting () {
 
-    const meetingsApi = axios.create({
-        baseURL: 'http://localhost:4000/api'
-    })
-
-
-    const [events, setEvents] = useState([])
     const [dateTime, setDateTime] = useState("")
-    const formReducer = (state, event) => {
-        return {
-            ...state,
-            [event.name]: event.value
-        }
-    }
     
-    // using formReducer
-    const [formData, setFormData] = useReducer(formReducer, {})
-    
-    const getEvents = async () => {
-        const meetings = await meetingsApi.get('/schedule')
-    }
 
-    const { isLoading, data, isError, error } = useQuery({
-        queryKey: ['meetings'],
-        queryFn: getEvents
+    // useQuery get the events
+    const { data: events, isLoading, isError, error } = useQuery({ 
+        queryKey: ['meetings'], 
+        queryFn: getEvents,
+        //select:
     })
 
     // Checking if is loading or get an error
@@ -70,37 +56,9 @@ function Meeting () {
         document.getElementById("modalEvent").style.display = "block"
         closeModal()
     }
-    
-
-    const addEvent = event => {
-        event.preventDefault();
-        const newEvent = {
-            title: formData.title,
-            url: formData.url,
-            start: dateTime
-        }
-
-        const updateEvents = [...events, newEvent];
-        setEvents(updateEvents)
-        document.getElementById("title").value = ""
-        document.getElementById("url").value = ""
-        closeModalEvent();
-    }
-
-    const handleChange = event => {
-        setFormData({
-            name: event.target.name,
-            value: event.target.value
-        })
-    }
-
-    /*useEffect(() => {
-        getEvents();
-    }, [])*/
 
     return(
         <>
-            <div>{JSON.stringify(data)}</div>
             <div className="container-meeting">
                 <div id="myModal" className="modal">
                     <div className="modal-content">
@@ -113,18 +71,21 @@ function Meeting () {
                         <div className="modal-body">
                             <div className="wrap-table">
                                 <table className="tableEvents">
-                                    <tr>
-                                        <th>Titulo</th>
-                                        <th>Fecha Inicio</th>
-                                        <th>URL</th>
-                                        <th>Participantes</th>
-                                    </tr>
+                                    <thead>
+                                        <tr>
+                                            <th>Titulo</th>
+                                            <th>Fecha Inicio</th>
+                                            <th>Link</th>
+                                            <th>Participantes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                     {
-                                        events.map(({title, start, url}) => (
-                                            <tr>
+                                        events.data.map(({_id, title, start, link}) => (
+                                            <tr key={_id}>
                                                 <td>{title}</td>
-                                                <td>{start}</td>
-                                                <td>{url}</td>
+                                                <td>{moment(start).format('D-MM-YYYY')}</td>
+                                                <td>{link}</td>
                                                 <td>
                                                     <ul>
                                                         <li>Luis Jimenez</li>
@@ -135,6 +96,7 @@ function Meeting () {
                                             </tr>
                                         ))
                                     } 
+                                    </tbody>
                                 </table>
                             </div>
                         </div>
@@ -154,24 +116,7 @@ function Meeting () {
                         </div>
                         <div className="modal-body">
                             <div className="center">
-                                <form action="" onSubmit={addEvent} id="formAddEvent">
-                                    <div>
-                                        <label htmlFor="">Titulo</label>
-                                        <input id="title" type="text" name="title" placeholder="Please type a title" onChange={handleChange}/>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="">URL Junta</label>
-                                        <input id="url" name="url" type="" placeholder="Please type URL meeting" onChange={handleChange}/>
-                                    </div>
-                                    <div>
-                                        <label>Selecciona participantes</label>
-                                        <select id="users" name="users" className="selectUsers" multiple>
-                                            <option value="">Luis</option>
-                                            <option value="">Mario</option>
-                                            <option value="">Jimeno</option>
-                                        </select>
-                                    </div>
-                                </form>
+                                <MeetingForm dateTime={ dateTime }/>
                             </div>
                         </div>
                         <div className="modal-footer">
@@ -191,7 +136,7 @@ function Meeting () {
                     }}
                     timeZone={"local"}
                     height={"80vh"}
-                    events={events}
+                    events={events.data}
                     selectable={true}
                     locale={"es"}
                     dateClick={(event) => { setDateTime(event.dateStr);  showModal()}}
