@@ -14,3 +14,7 @@ export const getEvents = async () => {
 export const createEvent = async (event) => {
     await meetingsApi.post('/schedule', event)
 }
+
+export const deleteEvent = async (id) => {
+    await meetingsApi.delete('/schedule/' + id)
+}

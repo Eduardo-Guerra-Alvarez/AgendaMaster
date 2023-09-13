@@ -5,16 +5,29 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { useState } from 'react';
 import './Meeting.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark } from '@fortawesome/free-solid-svg-icons';
-import { useQuery } from '@tanstack/react-query'
-import { getEvents } from '../../Api/meedingApi'
+import { faXmark, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { getEvents, deleteEvent } from '../../Api/meetingApi'
 import MeetingForm from './MeetingForm'
 import  moment from 'moment'
 
 function Meeting () {
 
-    const [dateTime, setDateTime] = useState("")
-    
+    const queryClient = useQueryClient()
+
+    const [dateTime, setDateTime] = useState({})
+
+    const deleteEventMutation = useMutation({
+        mutationFn: deleteEvent,
+        onSuccess: () => {
+            console.log("event deleted successfully");
+            queryClient.invalidateQueries('mettings')
+        }
+    })
+
+    const handleDelete = (id) => {
+        deleteEventMutation.mutate(id)
+    }
 
     // useQuery get the events
     const { data: events, isLoading, isError, error } = useQuery({ 
@@ -26,6 +39,7 @@ function Meeting () {
     // Checking if is loading or get an error
     if (isLoading) return <div>Loading...</div>
     else if (isError) return <div>Error: {error.message}</div>
+
 
     // Get the modal
     let modal = document.getElementById("myModal")
@@ -48,13 +62,38 @@ function Meeting () {
         }
     }
 
+
     const showModal = () => {
+
         document.getElementById("myModal").style.display = "block"
     }
 
     const showModalEvent = () => {
         document.getElementById("modalEvent").style.display = "block"
         closeModal()
+    }
+
+    const showEvents = () => {
+        const eventsByDate = events.data.filter(ev => moment(dateTime.dateStr).format("YYYY-MM-D") === moment(ev.start).format("YYYY-MM-D"))
+        return eventsByDate.map(({_id, title, start, link}) => (
+            <tr key={_id}>
+                <td>{title}</td>
+                <td>{moment(start).format('D-MM-YYYY')}</td>
+                <td>{link}</td>
+                <td>
+                    <ul>
+                        <li>Luis Jimenez</li>
+                        <li>Mario Ramirez</li>
+                        <li>Juan</li>
+                    </ul>
+                </td>
+                <td>
+                    <button className="trash" onClick={() => handleDelete(_id)}>
+                        <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                </td>
+            </tr>
+        ))
     }
 
     return(
@@ -77,25 +116,11 @@ function Meeting () {
                                             <th>Fecha Inicio</th>
                                             <th>Link</th>
                                             <th>Participantes</th>
+                                            <th>Accion</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {
-                                        events.data.map(({_id, title, start, link}) => (
-                                            <tr key={_id}>
-                                                <td>{title}</td>
-                                                <td>{moment(start).format('D-MM-YYYY')}</td>
-                                                <td>{link}</td>
-                                                <td>
-                                                    <ul>
-                                                        <li>Luis Jimenez</li>
-                                                        <li>Mario Ramirez</li>
-                                                        <li>Juan</li>
-                                                    </ul>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    } 
+                                        { showEvents() }
                                     </tbody>
                                 </table>
                             </div>
@@ -116,7 +141,7 @@ function Meeting () {
                         </div>
                         <div className="modal-body">
                             <div className="center">
-                                <MeetingForm dateTime={ dateTime }/>
+                                <MeetingForm dateTime={ dateTime.dateStr } allDay={ dateTime.allDay }/>
                             </div>
                         </div>
                         <div className="modal-footer">
@@ -139,7 +164,7 @@ function Meeting () {
                     events={events.data}
                     selectable={true}
                     locale={"es"}
-                    dateClick={(event) => { setDateTime(event.dateStr);  showModal()}}
+                    dateClick={(event) => { setDateTime(event); console.log(event); showModal()}}
                 />
             </div>
             

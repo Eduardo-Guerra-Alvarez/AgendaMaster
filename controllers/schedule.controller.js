@@ -4,7 +4,7 @@ const scheduleController = {};
 
 scheduleController.createSchedule = async (req, res) => {
     try {
-        const schedule = new Schedule(req.body.Schedule);
+        const schedule = new Schedule(req.body);
         await schedule.save();
         if(!schedule) {
             console.log("Schedule not created")
@@ -68,7 +68,6 @@ scheduleController.updateSchedule = async (req, res) => {
 scheduleController.deleteSchedule = async(req, res) => {
     try {
         const schedule = await Schedule.findByIdAndDelete(req.params.id);
-        console.log(schedule)
         if(!schedule) {
             console.log("Schedule not deleted")
             res.status(404).json({ message: 'Schedule not deleted'})

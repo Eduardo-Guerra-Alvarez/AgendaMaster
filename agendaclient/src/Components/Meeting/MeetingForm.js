@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { createEvent } from '../../Api/meedingApi'
+import { createEvent } from '../../Api/meetingApi'
 import { useReducer } from 'react';
 
-function MeetingForm ({ dateTime }){
+function MeetingForm ({ dateTime, allDay}){
 
     const queryClient = useQueryClient()
 
@@ -34,10 +34,9 @@ function MeetingForm ({ dateTime }){
             title: formData.title,
             link: formData.link,
             commit: formData.commit,
-            start: dateTime
+            start: dateTime,
+            allDay: allDay
         }
-
-        console.log(newEvent)
 
         addEventMutation.mutate(newEvent)
 

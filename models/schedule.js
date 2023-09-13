@@ -5,7 +5,8 @@ const Schedule = new Schema({
     title: { type: String, required: true },
     link: { type: String, required: false },
     comments: { type: String, required: false },
-    date: { type: Date, required: true },
+    start: { type: Date, required: true },
+    allDay: { type: Boolean },
     participants: [{
         type: Schema.Types.ObjectId,
         ref: 'Participant'
