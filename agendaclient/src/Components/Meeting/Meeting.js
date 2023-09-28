@@ -87,11 +87,13 @@ function Meeting () {
     }
 
     const showEvents = () => {
-        const eventsByDate = events.data.filter(ev => moment(dateTime.dateStr).format("YYYY-MM-D") === moment(ev.start).format("YYYY-MM-D"))
+        const eventsByDate = events.data.filter(ev => dateTime.dateStr === ev.start)
+        console.log(eventsByDate)
+
         return eventsByDate.map(({_id, title, start, link, comments}) => (
             <tr key={_id}>
                 <td>{title}</td>
-                <td>{moment(start).format('D-MM-YYYY')}</td>
+                <td>{start}</td>
                 <td>{link}</td>
                 <td>
                     <ul>

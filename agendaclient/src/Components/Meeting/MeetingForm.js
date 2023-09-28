@@ -67,6 +67,7 @@ function MeetingForm ({ dateTime, allDay, getEvent }){
                 start: dateTime,
                 allDay: allDay
             }
+            console.log(newEvent)
 
             addEventMutation.mutate(newEvent)
         }
@@ -93,7 +94,6 @@ function MeetingForm ({ dateTime, allDay, getEvent }){
                 payload: getEvent
             })
         } else {
-            console.log(formData)
             setFormData({
                 type: 'UPDATE_MEETING',
                 payload: {
