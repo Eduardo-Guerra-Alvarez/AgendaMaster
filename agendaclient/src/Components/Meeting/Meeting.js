@@ -5,7 +5,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { useState } from 'react';
 import './Meeting.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faXmark, faTrash, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getEvents, deleteEvent } from '../../Api/meetingApi'
 import MeetingForm from './MeetingForm'
@@ -16,6 +16,8 @@ function Meeting () {
     const queryClient = useQueryClient()
 
     const [dateTime, setDateTime] = useState({})
+    const [getEvent, setGetEvent] = useState({})
+    const [isEdit, setIsEdit] = useState(false)
 
     const deleteEventMutation = useMutation({
         mutationFn: deleteEvent,
@@ -27,6 +29,13 @@ function Meeting () {
 
     const handleDelete = (id) => {
         deleteEventMutation.mutate(id)
+    }
+
+    const handleEdit = (eventEdit) => {
+        setGetEvent({
+            ...eventEdit,
+            edit: true
+        });
     }
 
     // useQuery get the events
@@ -51,7 +60,11 @@ function Meeting () {
     }
 
     const closeModalEvent = () => {
+        if(isEdit) setIsEdit(false)
         document.getElementById("modalEvent").style.display = "none"
+        document.getElementById("title").value = ""
+        document.getElementById("link").value = ""
+        document.getElementById("comments").value = ""
     }
 
     window.onclick = function(event) {
@@ -75,7 +88,7 @@ function Meeting () {
 
     const showEvents = () => {
         const eventsByDate = events.data.filter(ev => moment(dateTime.dateStr).format("YYYY-MM-D") === moment(ev.start).format("YYYY-MM-D"))
-        return eventsByDate.map(({_id, title, start, link}) => (
+        return eventsByDate.map(({_id, title, start, link, comments}) => (
             <tr key={_id}>
                 <td>{title}</td>
                 <td>{moment(start).format('D-MM-YYYY')}</td>
@@ -90,6 +103,9 @@ function Meeting () {
                 <td>
                     <button className="trash" onClick={() => handleDelete(_id)}>
                         <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                    <button className="edit" onClick={() => { handleEdit({_id, title, start, link, comments}); showModalEvent(); setIsEdit(true) }}>
+                        <FontAwesomeIcon icon={faPenToSquare} />
                     </button>
                 </td>
             </tr>
@@ -137,15 +153,15 @@ function Meeting () {
                             <FontAwesomeIcon icon={faXmark} className="close"
                                 onClick={closeModalEvent}
                             />
-                            <h2>Crear un Nuevo Evento</h2>
+                            <h2>{isEdit ? "Editar" : "Crear"} un Nuevo Evento</h2>
                         </div>
                         <div className="modal-body">
                             <div className="center">
-                                <MeetingForm dateTime={ dateTime.dateStr } allDay={ dateTime.allDay }/>
+                                <MeetingForm dateTime={ dateTime.dateStr } allDay={ dateTime.allDay } getEvent={ isEdit ? getEvent : {} }/>
                             </div>
                         </div>
                         <div className="modal-footer">
-                            <button form="formAddEvent">Crear</button>
+                            <button form="formAddEvent">{isEdit ? "Editar" : "Crear"}</button>
                             <button onClick={closeModalEvent}>Cerrar</button>
                         </div>
                     </div>
@@ -164,7 +180,7 @@ function Meeting () {
                     events={events.data}
                     selectable={true}
                     locale={"es"}
-                    dateClick={(event) => { setDateTime(event); console.log(event); showModal()}}
+                    dateClick={(event) => { setDateTime(event); showModal()}}
                 />
             </div>
             

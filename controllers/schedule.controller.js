@@ -51,7 +51,7 @@ scheduleController.getSchedule = async(req, res) => {
 }
 scheduleController.updateSchedule = async (req, res) => {
     try {
-        const schedule = await Schedule.findByIdAndUpdate(req.params.id, req.body.Schedule);
+        const schedule = await Schedule.findByIdAndUpdate(req.params.id, req.body);
         if(!schedule) {
             console.log("Schedule not updated")
             res.status(404).json({ message: 'Schedule not updated'})

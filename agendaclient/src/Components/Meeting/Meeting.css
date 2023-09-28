@@ -105,6 +105,17 @@
     color: #85251a;
 }
 
+.edit {
+    margin-left: 10px;
+    border: none;
+    color: #ffc61a;
+    cursor: pointer;
+}
+
+.edit:active {
+    color: #997300;
+}
+
 .modal-footer {
     display: flex;
     justify-content: end;
@@ -163,9 +174,10 @@
 
 #formAddEvent textarea {
     width: 100%;
-    font-size: 14px;
+    font-size: 16px;
     padding: 10px;
     border-radius: 5px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .selectUsers {
