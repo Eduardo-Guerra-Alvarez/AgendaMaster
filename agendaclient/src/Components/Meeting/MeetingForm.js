@@ -6,12 +6,6 @@ import { useReducer, useEffect, } from 'react';
 
 function MeetingForm ({ dateTime, allDay, getEvent }){
 
-    const formReducer = (state, event) => {
-        return {
-            ...state,
-            [event.name]: event.value
-        }
-    }
     const reducer = (state, action) => {
     switch (action.type) {
       case 'UPDATE_MEETING':

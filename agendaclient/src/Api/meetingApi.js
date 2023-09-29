@@ -12,7 +12,6 @@ export const getEvents = async () => {
 }
 
 export const createEvent = async (event) => {
-    console.log(event)
     await meetingsApi.post('/', event)
 }
 
