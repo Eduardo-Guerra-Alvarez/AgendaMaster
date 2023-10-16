@@ -8,8 +8,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark, faTrash, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getEvents, deleteEvent } from '../../Api/meetingApi'
+import { getParticipants } from '../../Api/userApi'
 import MeetingForm from './MeetingForm'
-import  moment from 'moment'
 
 function Meeting () {
 
@@ -45,10 +45,18 @@ function Meeting () {
         //select:
     })
 
+    const { data: participants, isLoadingParticipants, isErrorParticipants
+        , errorParticipants } = useQuery({ 
+        queryKey: ['participants'],
+        queryFn: getParticipants,
+    })
+
     // Checking if is loading or get an error
     if (isLoading) return <div>Loading...</div>
     else if (isError) return <div>Error: {error.message}</div>
 
+    if (isLoadingParticipants) return <div>Loading...</div>
+    else if (isErrorParticipants) return <div>Error: {errorParticipants.message}</div>
 
     // Get the modal
     let modal = document.getElementById("myModal")
@@ -88,7 +96,6 @@ function Meeting () {
 
     const showEvents = () => {
         const eventsByDate = events.data.filter(ev => dateTime.dateStr === ev.start)
-        console.log(eventsByDate)
 
         return eventsByDate.map(({_id, title, start, link, comments}) => (
             <tr key={_id}>

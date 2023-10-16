@@ -61,8 +61,6 @@ function MeetingForm ({ dateTime, allDay, getEvent }){
                 start: dateTime,
                 allDay: allDay
             }
-            console.log(newEvent)
-
             addEventMutation.mutate(newEvent)
         }
 

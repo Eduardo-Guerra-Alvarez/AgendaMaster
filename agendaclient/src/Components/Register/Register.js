@@ -1,9 +1,14 @@
 import './Register.css'
 import { Link } from "react-router-dom";
-import { useReducer } from 'react';
+import { useReducer, useState } from 'react';
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { createParticipant } from '../../Api/userApi';
+import { redirect } from 'react-router-dom';
 
 function Login () {
     
+    const [user, setUser] = useState(null)
+
     const reducer = (state, action) => {
         switch (action.type) {
         case 'CREATE_USER':
@@ -15,8 +20,21 @@ function Login () {
 
     const [formData, setFormData] = useReducer(reducer, {})
 
+    const queryClient = useQueryClient()
+
+    const addUserMutation = useMutation({
+        mutationFn: createParticipant,
+        onSuccess: ({data}) => {
+            console.log(data.message)
+            setUser(data.participant)
+            redirect('/meetings')
+            queryClient.invalidateQueries('users')
+        }
+    })
+
     const handlSubmit = e => {
         e.preventDefault();
+        addUserMutation.mutate(formData)
     }
 
     const handleChange = e => {
@@ -29,9 +47,9 @@ function Login () {
 
     return(
         <>
-        <div class="container-register">
+        <div className="container-register">
             <main>
-                <div class="formulario-register">
+                <div className="formulario-register">
                 <h1>Registrar</h1>
                     <form onSubmit={handlSubmit}>
                         <div>
@@ -46,7 +64,7 @@ function Login () {
                         </div>
                         <div>
                             <label>Télefono</label>
-                            <input id="phone" name='phone' type="number" placeholder="Introduce un numero télefonico" max="10" 
+                            <input id="phone" name='phone' type="number" placeholder="Introduce un numero télefonico" 
                             onChange={handleChange}/>
                         </div>
 

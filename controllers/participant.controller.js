@@ -32,13 +32,13 @@ participantController.getParticipant = (req, res) => {
 }
 
 participantController.createParticipant = async(req, res) => {
-    const participant = new Participant(req.body.participant)
+    const participant = new Participant(req.body)
     await participant.save()
     if(!participant) {
         console.log(err);
         return res.status(404).json({ message: 'Participant not created, error: ' + err })
     }
-    return res.status(200).json({ message: 'Participant created successfully'})
+    return res.status(200).json({ participant: participant, message: 'Participant created successfully'})
 }
 
 participantController.updateParticipant = (req, res) => {

@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const usesApi = axios.create({
+const usersApi = axios.create({
     baseURL: 'http://localhost:4000/api/participant',
     headers: {
         "Content-type": "application/json"
@@ -8,16 +8,16 @@ const usesApi = axios.create({
 })
 
 export const getParticipants = async () => {
-    return await usesApi.get('/')
+    return await usersApi.get('/')
 
 }
 
 export const getParticipant = async (id) => {
-    return await usesApi.get('/' + id)
+    return await usersApi.get('/' + id)
 }
 
 export const createParticipant = async (participant) => {
-    await usersApi.post('/', participant)
+    return await usersApi.post('/', participant)
 }
 
 export const updateParticipant = async (id, participant) => {
