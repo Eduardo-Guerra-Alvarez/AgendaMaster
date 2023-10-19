@@ -1,5 +1,6 @@
 const Participant = require('../models/participant')
 const Schedule = require('../models/schedule')
+const bcrypt = require('bcrypt')
 
 const participantController = {}
 
@@ -32,13 +33,29 @@ participantController.getParticipant = (req, res) => {
 }
 
 participantController.createParticipant = async(req, res) => {
-    const participant = new Participant(req.body)
-    await participant.save()
-    if(!participant) {
-        console.log(err);
-        return res.status(404).json({ message: 'Participant not created, error: ' + err })
+    const isParticipant = await Participant.findOne({ email: req.body.email })
+
+    if(isParticipant == null) {
+        const saltRounds = 10
+
+        bcrypt.hash(req.body.password, saltRounds, async (err, hash) => {
+            if(err) return res.status(404).json({ message: err }) 
+            req.body.password = hash
+            const participant = new Participant(req.body)
+            await participant.save()
+            if(!participant) {
+                console.log(err);
+                return res.status(404).json({ message: 'Participant not created, error: ' + err })
+            }
+            return res.status(200).json({ participant: participant, message: 'Participant created successfully'})
+
+        })
+
+        
+    } else {
+        return res.status(404).json({ message: 'email is already used,'})
     }
-    return res.status(200).json({ participant: participant, message: 'Participant created successfully'})
+
 }
 
 participantController.updateParticipant = (req, res) => {
