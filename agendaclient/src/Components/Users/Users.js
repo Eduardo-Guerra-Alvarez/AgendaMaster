@@ -28,7 +28,7 @@ function Users () {
         <>
             <div className="containerUser">
                 <h1>Users</h1>
-                <div className="wrap-table">
+                <div className="wrap-table-users">
                     <table className="tableEvents">
                         <thead>
                             <tr>

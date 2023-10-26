@@ -1,21 +1,70 @@
 import './Login.css'
-import { Link } from "react-router-dom";
+import { Link, useNavigate} from "react-router-dom";
+import { getParticipantLogin } from '../../Api/userApi'
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import {useReducer} from 'react';
 
 function Login () {
+
+    const reducer = (state, action) => {
+        switch (action.type) {
+            case 'LOGIN':
+                return { ...state, ...action.payload }
+            default:
+                return state;
+        }
+    }
+
+    const [formData, setFormData] = useReducer(reducer, {})
+
+    const navigate = useNavigate()
+
+    const queryClient = useQueryClient()
+
+    const loginUserMutation = useMutation({
+        mutationFn: getParticipantLogin,
+        onSuccess: ({data}) => {
+            console.log(data)
+            navigate("/meetings")
+        },
+        onError: (error) => {
+            console.log(error.response.data)
+        }
+    })
+
+    const handlSubmit = e => {
+        e.preventDefault()
+        loginUserMutation.mutate(formData)
+    }
+
+    const handleChange = e => {
+        const {name, value} = e.target
+        setFormData({
+            type: 'LOGIN',
+            payload: { [name]: value }
+        })
+    }
+
     return(
         <>
-        <div class="container-login">
+        <div className="container-login">
             <main>
-                <div class="formulario-login">
+                <div className="formulario-login">
                 <h1>Login</h1>
-                    <form action="">
+                    <form onSubmit={handlSubmit}>
                         <div>
                             <label>Email</label>
-                            <input type="email" placeholder="Introduce un correo electronico" />
+                            <input type="email" 
+                            name="email"
+                            placeholder="Introduce un correo electronico" 
+                            onChange={handleChange}/>
                         </div>
                         <div>
                             <label>Contraseña</label>
-                            <input type="password" placeholder="Introduce una contraseña" />
+                            <input type="password" 
+                            name="password"
+                            placeholder="Introduce una contraseña" 
+                            onChange={handleChange}/>
                         </div>
                         <div>
                             <button type="submit">Login</button>

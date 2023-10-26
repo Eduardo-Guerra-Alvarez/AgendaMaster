@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import { useReducer, useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createParticipant } from '../../Api/userApi';
-import { redirect } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 function Login () {
     
+    const navigate = useNavigate()
     const [user, setUser] = useState(null)
 
     const reducer = (state, action) => {
@@ -27,8 +28,11 @@ function Login () {
         onSuccess: ({data}) => {
             console.log(data.message)
             setUser(data.participant)
-            redirect('/meetings')
             queryClient.invalidateQueries('users')
+            navigate("/meetings") // redirect to /meetings
+        },
+        onError: (error) => {
+            console.log(error.response.data)
         }
     })
 
@@ -64,7 +68,8 @@ function Login () {
                         </div>
                         <div>
                             <label>Télefono</label>
-                            <input id="phone" name='phone' type="number" placeholder="Introduce un numero télefonico" 
+                            <input id="phone" name='phone' type="text" placeholder="Introduce un numero télefonico" 
+                            pattern="[0-9]{10}"
                             onChange={handleChange}/>
                         </div>
 

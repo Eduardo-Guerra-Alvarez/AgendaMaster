@@ -16,6 +16,10 @@ export const getParticipant = async (id) => {
     return await usersApi.get('/' + id)
 }
 
+export const getParticipantLogin = async (user) => {
+    return await usersApi.post('/login', user)
+}
+
 export const createParticipant = async (participant) => {
     return await usersApi.post('/', participant)
 }

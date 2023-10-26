@@ -22,7 +22,7 @@ function Menu() {
                 <ul className="menu">
                     <li><Link to={"meetings"}>Meetings</Link></li>
                     <li><Link to={"users"}>Users</Link></li>
-                    <li><Link to={""}>Logout</Link></li>
+                    <li><Link to={"login"}>Logout</Link></li>
                 </ul>
             </nav>
         </header>
