@@ -1,6 +1,8 @@
 const Participant = require('../models/participant')
 const Schedule = require('../models/schedule')
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+require("dotenv").config()
 
 const participantController = {}
 
@@ -56,6 +58,30 @@ participantController.createParticipant = async(req, res) => {
         return res.status(404).json({ message: 'email is already used,'})
     }
 
+}
+
+participantController.loginParticipant = async(req, res) => {
+    const { email, password } = req.body
+    const participant = await Participant.findOne({ email })
+    const isPasswordCorrect = participant === null
+        ? false
+        : await bcrypt.compare(password, participant.password)
+    if(!isPasswordCorrect) {
+        return res.status(401).json({ message: 'invalid user or password' })
+    }
+
+    const participantForToken = {
+        id: participant._id,
+        email: participant.email
+    }
+
+    const token = jwt.sign(participantForToken, process.env.SECRET)
+
+    return res.status(200).send({
+        name: participant.name,
+        email: participant.email,
+        token: token
+    })
 }
 
 participantController.updateParticipant = (req, res) => {
