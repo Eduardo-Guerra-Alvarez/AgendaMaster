@@ -1,5 +1,7 @@
 import axios from 'axios'
+import Cookies from 'universal-cookie'
 
+const cookie = new Cookies()
 const usersApi = axios.create({
     baseURL: 'http://localhost:4000/api/participant',
     headers: {
@@ -8,7 +10,11 @@ const usersApi = axios.create({
 })
 
 export const getParticipants = async () => {
-    return await usersApi.get('/')
+    return await usersApi.get('/', {
+        headers: {
+            Authorization: `${cookie.get('user')}`
+        }
+    })
 
 }
 

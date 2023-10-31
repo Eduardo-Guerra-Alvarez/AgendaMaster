@@ -3,8 +3,12 @@ import { Link, useNavigate} from "react-router-dom";
 import { getParticipantLogin } from '../../Api/userApi'
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import {useReducer} from 'react';
+import Cookies from 'universal-cookie'
+
 
 function Login () {
+
+    const cookie = new Cookies();
 
     const reducer = (state, action) => {
         switch (action.type) {
@@ -19,12 +23,11 @@ function Login () {
 
     const navigate = useNavigate()
 
-    const queryClient = useQueryClient()
-
     const loginUserMutation = useMutation({
         mutationFn: getParticipantLogin,
         onSuccess: ({data}) => {
-            console.log(data)
+            console.log(data.token)
+            cookie.set('user', JSON.stringify(data), { path: '/' })
             navigate("/meetings")
         },
         onError: (error) => {

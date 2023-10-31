@@ -4,78 +4,51 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { useState } from 'react';
 import './Meeting.css'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faXmark, faTrash, faPenToSquare } from '@fortawesome/free-solid-svg-icons';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getEvents, deleteEvent } from '../../Api/meetingApi'
-import { getParticipants } from '../../Api/userApi'
-import MeetingForm from './MeetingForm'
+import { useQuery } from '@tanstack/react-query'
+import { getEvents } from '../../Api/meetingApi'
+//import { getParticipants } from '../../Api/userApi'
+import ModalTableEvents from './ModalTableEvents';
+import ModalEvents from './ModalEvents';
 
 function Meeting () {
 
-    const queryClient = useQueryClient()
 
     const [dateTime, setDateTime] = useState({})
     const [getEvent, setGetEvent] = useState({})
     const [isEdit, setIsEdit] = useState(false)
 
-    const deleteEventMutation = useMutation({
-        mutationFn: deleteEvent,
-        onSuccess: () => {
-            console.log("event deleted successfully");
-            queryClient.invalidateQueries('mettings')
-        }
-    })
-
-    const handleDelete = (id) => {
-        deleteEventMutation.mutate(id)
-    }
-
-    const handleEdit = (eventEdit) => {
-        setGetEvent({
-            ...eventEdit,
-            edit: true
-        });
-    }
-
     // useQuery get the events
     const { data: events, isLoading, isError, error } = useQuery({ 
         queryKey: ['meetings'], 
         queryFn: getEvents,
+        onError: error => {
+            console.log(error.response.data)
+        }
         //select:
     })
 
-    const { data: participants, isLoadingParticipants, isErrorParticipants
-        , errorParticipants } = useQuery({ 
-        queryKey: ['participants'],
-        queryFn: getParticipants,
-    })
 
+    const handleEdit = (eventEdit) => {
+        setIsEdit(true)
+        setGetEvent({
+            ...eventEdit
+        });
+    }
+
+    const handleIsEdit = (edit) => {
+        setIsEdit(edit)
+    }
+    
     // Checking if is loading or get an error
     if (isLoading) return <div>Loading...</div>
     else if (isError) return <div>Error: {error.message}</div>
 
-    if (isLoadingParticipants) return <div>Loading...</div>
-    else if (isErrorParticipants) return <div>Error: {errorParticipants.message}</div>
-
     // Get the modal
     let modal = document.getElementById("myModal")
     let modalEvent = document.getElementById("modalEvent")
-    // Get the close modal
-
-    const closeModal = () => {
-        document.getElementById("myModal").style.display = "none"
-    }
-
-    const closeModalEvent = () => {
-        if(isEdit) setIsEdit(false)
-        document.getElementById("modalEvent").style.display = "none"
-        document.getElementById("title").value = ""
-        document.getElementById("link").value = ""
-        document.getElementById("comments").value = ""
-    }
 
     window.onclick = function(event) {
+        handleIsEdit(false)
         if (event.target === modal) {
             modal.style.display = "none";
         } else if (event.target === modalEvent) {
@@ -83,99 +56,15 @@ function Meeting () {
         }
     }
 
-
     const showModal = () => {
-
         document.getElementById("myModal").style.display = "block"
-    }
-
-    const showModalEvent = () => {
-        document.getElementById("modalEvent").style.display = "block"
-        closeModal()
-    }
-
-    const showEvents = () => {
-        const eventsByDate = events.data.filter(ev => dateTime.dateStr === ev.start)
-
-        return eventsByDate.map(({_id, title, start, link, comments}) => (
-            <tr key={_id}>
-                <td>{title}</td>
-                <td>{start}</td>
-                <td>{link}</td>
-                <td>
-                    <ul>
-                        <li>Luis Jimenez</li>
-                        <li>Mario Ramirez</li>
-                        <li>Juan</li>
-                    </ul>
-                </td>
-                <td>
-                    <button className="trash" onClick={() => handleDelete(_id)}>
-                        <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                    <button className="edit" onClick={() => { handleEdit({_id, title, start, link, comments}); showModalEvent(); setIsEdit(true) }}>
-                        <FontAwesomeIcon icon={faPenToSquare} />
-                    </button>
-                </td>
-            </tr>
-        ))
     }
 
     return(
         <>
             <div className="container-meeting">
-                <div id="myModal" className="modal">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <FontAwesomeIcon icon={faXmark} className="close"
-                                onClick={closeModal}
-                            />
-                            <h2>Eventos</h2>
-                        </div>
-                        <div className="modal-body">
-                            <div className="wrap-table">
-                                <table className="tableEvents">
-                                    <thead>
-                                        <tr>
-                                            <th>Titulo</th>
-                                            <th>Fecha Inicio</th>
-                                            <th>Link</th>
-                                            <th>Participantes</th>
-                                            <th>Accion</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        { showEvents() }
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button onClick={showModalEvent} id="createEvent">Crear evento</button>
-                            <button onClick={closeModal}>Cerrar</button>
-                        </div>
-                    </div>
-                </div>
-                <div id="modalEvent" className="modal">
-                    <div className="modal-content">
-                        <div className="modal-header">
-                            <FontAwesomeIcon icon={faXmark} className="close"
-                                onClick={closeModalEvent}
-                            />
-                            <h2>{isEdit ? "Editar" : "Crear"} un Nuevo Evento</h2>
-                        </div>
-                        <div className="modal-body">
-                            <div className="center">
-                                <MeetingForm dateTime={ dateTime.dateStr } allDay={ dateTime.allDay } getEvent={ isEdit ? getEvent : {} }/>
-                            </div>
-                        </div>
-                        <div className="modal-footer">
-                            <button form="formAddEvent">{isEdit ? "Editar" : "Crear"}</button>
-                            <button onClick={closeModalEvent}>Cerrar</button>
-                        </div>
-                    </div>
-                </div>
-                
+                <ModalTableEvents events={events} dateTime={dateTime} handleEdit={handleEdit}/>
+                <ModalEvents dateTime={dateTime} isEdit={isEdit} getEvent={getEvent} handleIsEdit={handleIsEdit} /> 
                 <FullCalendar
                     plugins={[dayGridPlugin,timeGridPlugin,interactionPlugin]}
                     initialView={"dayGridMonth"}
@@ -192,7 +81,6 @@ function Meeting () {
                     dateClick={(event) => { setDateTime(event); showModal()}}
                 />
             </div>
-            
         </>
     )
 }
