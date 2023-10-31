@@ -1,9 +1,10 @@
 const participantController = require('../controllers/participant.controller')
 const { Router } = require('express')
 const router = Router();
+const verifyToken = require('../middlewares/access_token')
 
 
-router.get('/', participantController.getParticipants);
+router.get('/', verifyToken, participantController.getParticipants);
 router.get('/:id', participantController.getParticipant);
 router.post('/', participantController.createParticipant);
 router.post('/login', participantController.loginParticipant);

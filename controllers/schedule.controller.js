@@ -20,6 +20,7 @@ scheduleController.createSchedule = async (req, res) => {
 }
 
 scheduleController.getSchedules = async (req, res) => {
+    console.log("ejecutandoce desde schedule")
     try {
         const schedules = await Schedule.find({})
             .populate('participants');

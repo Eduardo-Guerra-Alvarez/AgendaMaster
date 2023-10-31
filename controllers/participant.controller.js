@@ -63,6 +63,7 @@ participantController.createParticipant = async(req, res) => {
 participantController.loginParticipant = async(req, res) => {
     const { email, password } = req.body
     const participant = await Participant.findOne({ email })
+    // check if participant is null return false, else compare password and if is incorrect return false
     const isPasswordCorrect = participant === null
         ? false
         : await bcrypt.compare(password, participant.password)
@@ -70,13 +71,16 @@ participantController.loginParticipant = async(req, res) => {
         return res.status(401).json({ message: 'invalid user or password' })
     }
 
+    // Create object for token
     const participantForToken = {
         id: participant._id,
         email: participant.email
     }
 
+    // pass object and secret key
     const token = jwt.sign(participantForToken, process.env.SECRET)
 
+    // return user and token
     return res.status(200).send({
         name: participant.name,
         email: participant.email,
