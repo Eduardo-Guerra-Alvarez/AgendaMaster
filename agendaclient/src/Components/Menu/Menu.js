@@ -1,13 +1,19 @@
 import './Menu.css'
 import { Outlet, Link } from 'react-router-dom'
+import Cookies from 'universal-cookie'
 
 function Menu() {
+
+    const cookie = new Cookies()
 
     const hamburger = () => {
         const navBar = document.querySelector('.menu-bar')
         navBar.classList.toggle("active")
     }
 
+    const handleToken = () => {
+        cookie.remove('user')
+    }
 
     return(
         <>
@@ -22,7 +28,7 @@ function Menu() {
                 <ul className="menu">
                     <li><Link to={"meetings"}>Meetings</Link></li>
                     <li><Link to={"users"}>Users</Link></li>
-                    <li><Link to={"login"}>Logout</Link></li>
+                    <li><Link to={"login"} onClick={handleToken}>Logout</Link></li>
                 </ul>
             </nav>
         </header>
