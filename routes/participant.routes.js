@@ -4,7 +4,7 @@ const router = Router();
 const verifyToken = require('../middlewares/access_token')
 
 
-router.get('/', verifyToken, participantController.getParticipants);
+router.get('/', participantController.getParticipants);
 router.get('/:id', participantController.getParticipant);
 router.post('/', participantController.createParticipant);
 router.post('/login', participantController.loginParticipant);

@@ -10,12 +10,7 @@ const usersApi = axios.create({
 })
 
 export const getParticipants = async () => {
-    return await usersApi.get('/', {
-        headers: {
-            Authorization: `${cookie.get('user')}`
-        }
-    })
-
+    return await usersApi.get('/')
 }
 
 export const getParticipant = async (id) => {

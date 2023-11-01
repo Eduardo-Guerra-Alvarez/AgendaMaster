@@ -1,10 +1,11 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { createEvent, editEvent } from '../../Api/meetingApi'
-import { useReducer, useEffect, } from 'react';
+import { useReducer, useEffect, useState } from 'react';
+import { getParticipants } from '../../Api/userApi';
 
 
 
-function MeetingForm ({ dateTime, allDay, getEvent }){
+function MeetingForm ({ dateTime, allDay, getEvent, isOpen}){
 
     const reducer = (state, action) => {
     switch (action.type) {
@@ -43,6 +44,7 @@ function MeetingForm ({ dateTime, allDay, getEvent }){
             queryClient.invalidateQueries('meetings')
         }
     })
+
 
     const [formData, setFormData] = useReducer(reducer, getEvent || {})
 
@@ -100,6 +102,24 @@ function MeetingForm ({ dateTime, allDay, getEvent }){
         }
     }, [getEvent])
 
+    const {data: participants, isLoading, isError, error } = useQuery({
+        enabled: isOpen,
+        queryFn: getParticipants,
+        queryKey:['participants'],
+        onError: (error) => { console.log(error) }
+    })
+
+    if(isLoading) return <div>Loading...</div>
+    else if(isError) return <div>{error}</div>
+
+    const renderParticipantSelect = () => {
+        console.log(participants.data[0].name)
+        return participants.data.map(participant => (
+            <option value={participant._id} key={participant._id}>{participant.name}</option>
+        ))
+    }
+
+
     return (
         <form action="" onSubmit={handleSubmit} id="formAddEvent">
             <div>
@@ -123,9 +143,7 @@ function MeetingForm ({ dateTime, allDay, getEvent }){
             <div>
                 <label>Selecciona participantes</label>
                 <select id="users" name="users" className="selectUsers" multiple>
-                    <option value="">Luis</option>
-                    <option value="">Mario</option>
-                    <option value="">Jimeno</option>
+                    { renderParticipantSelect() }
                 </select>
             </div>
         </form>

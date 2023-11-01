@@ -6,16 +6,16 @@ import { useState } from 'react';
 import './Meeting.css'
 import { useQuery } from '@tanstack/react-query'
 import { getEvents } from '../../Api/meetingApi'
+import { useNavigate } from 'react-router-dom';
 //import { getParticipants } from '../../Api/userApi'
 import ModalTableEvents from './ModalTableEvents';
-import ModalEvents from './ModalEvents';
+import PacmanLoader from "react-spinners/ClipLoader";
 
 function Meeting () {
 
+    const navigate = useNavigate()
 
     const [dateTime, setDateTime] = useState({})
-    const [getEvent, setGetEvent] = useState({})
-    const [isEdit, setIsEdit] = useState(false)
 
     // useQuery get the events
     const { data: events, isLoading, isError, error } = useQuery({ 
@@ -23,32 +23,25 @@ function Meeting () {
         queryFn: getEvents,
         onError: error => {
             console.log(error.response.data)
+            //navigate("/login")
         }
         //select:
     })
-
-
-    const handleEdit = (eventEdit) => {
-        setIsEdit(true)
-        setGetEvent({
-            ...eventEdit
-        });
-    }
-
-    const handleIsEdit = (edit) => {
-        setIsEdit(edit)
-    }
-    
     // Checking if is loading or get an error
-    if (isLoading) return <div>Loading...</div>
-    else if (isError) return <div>Error: {error.message}</div>
+    if (isLoading) return (<div className="loader-spinner">
+            <PacmanLoader
+            color={'#66ccff'}
+            loading={isLoading}
+            size={150}
+            />
+        </div>)
+    else if (isError) return <div className="loader-spinner">Error: {error.message}</div>
 
     // Get the modal
     let modal = document.getElementById("myModal")
     let modalEvent = document.getElementById("modalEvent")
 
     window.onclick = function(event) {
-        handleIsEdit(false)
         if (event.target === modal) {
             modal.style.display = "none";
         } else if (event.target === modalEvent) {
@@ -63,8 +56,7 @@ function Meeting () {
     return(
         <>
             <div className="container-meeting">
-                <ModalTableEvents events={events} dateTime={dateTime} handleEdit={handleEdit}/>
-                <ModalEvents dateTime={dateTime} isEdit={isEdit} getEvent={getEvent} handleIsEdit={handleIsEdit} /> 
+                <ModalTableEvents events={events} dateTime={dateTime}/>
                 <FullCalendar
                     plugins={[dayGridPlugin,timeGridPlugin,interactionPlugin]}
                     initialView={"dayGridMonth"}

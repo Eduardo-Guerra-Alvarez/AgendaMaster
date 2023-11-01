@@ -26,8 +26,8 @@ function ModalEvents ({ dateTime, isEdit, getEvent, handleIsEdit}) {
                                 <MeetingForm 
                                 dateTime={ dateTime.dateStr } 
                                 allDay={ dateTime.allDay } 
-                                getEvent={ isEdit ? getEvent : {}
-                                }/>
+                                getEvent={ isEdit ? getEvent : {}}
+                                />
                             </div>
                         </div>
                         <div className="modal-footer">
