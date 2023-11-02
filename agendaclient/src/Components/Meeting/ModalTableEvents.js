@@ -27,9 +27,10 @@ function ModalTableEvents ({events, dateTime}) {
     }
 
     const handleEdit = (eventEdit) => {
+        console.log(eventEdit)
         setIsEdit(true)
         setGetEvent({
-            ...eventEdit
+            ...eventEdit,
         });
     }
 
@@ -40,16 +41,18 @@ function ModalTableEvents ({events, dateTime}) {
     const showEvents = () => {
         const eventsByDate = events.data.filter(ev => dateTime.dateStr === ev.start)
 
-        return eventsByDate.map(({_id, title, start, link, comments}) => (
+        return eventsByDate.map(({_id, title, start, link, comments, participants}) => (
             <tr key={_id}>
                 <td>{title}</td>
                 <td>{start}</td>
                 <td>{link}</td>
                 <td>
                     <ul>
-                        <li>Luis Jimenez</li>
-                        <li>Mario Ramirez</li>
-                        <li>Juan</li>
+                        {
+                            participants.map(participant => (
+                                <li key={participant._id}>{participant.name}</li>
+                            ))
+                        }
                     </ul>
                 </td>
                 <td>
@@ -57,7 +60,7 @@ function ModalTableEvents ({events, dateTime}) {
                         <FontAwesomeIcon icon={faTrash} />
                     </button>
                     <button className="edit" onClick={() => { 
-                        handleEdit({_id, title, start, link, comments, edit: true}); 
+                        handleEdit({_id, title, start, link, comments, edit: true, participants: participants.map(p => p._id)}); 
                         showModalEvent(); 
                     }}>
                         <FontAwesomeIcon icon={faPenToSquare} />

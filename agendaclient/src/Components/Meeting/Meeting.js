@@ -24,9 +24,12 @@ function Meeting () {
         onError: error => {
             console.log(error.response.data)
             //navigate("/login")
-        }
+        },
+        retry: false, // if fetch failed not retry
+        refetchOnWindowFocus: false // this is avoid useQuery execute all time when focus window
         //select:
     })
+
     // Checking if is loading or get an error
     if (isLoading) return (<div className="loader-spinner">
             <PacmanLoader

@@ -24,7 +24,7 @@ function MeetingForm ({ dateTime, allDay, getEvent, isOpen}){
     const queryClient = useQueryClient()
 
     const closeModalEvent = () => {
-        document.getElementById("modalEvent").style.display = "none"
+        document.getElementById("myModal").style.display = "none"
     }
 
     const addEventMutation = useMutation({
@@ -61,7 +61,9 @@ function MeetingForm ({ dateTime, allDay, getEvent, isOpen}){
                 link: formData.link,
                 comments: formData.comments,
                 start: dateTime,
-                allDay: allDay
+                allDay: allDay,addEventMutation,
+                participants: formData.participants
+
             }
             addEventMutation.mutate(newEvent)
         }
@@ -69,19 +71,29 @@ function MeetingForm ({ dateTime, allDay, getEvent, isOpen}){
         document.getElementById("title").value = ""
         document.getElementById("link").value = ""
         document.getElementById("comments").value = ""
+        document.getElementById("participants").value = []
 
         closeModalEvent();
     }
 
     const handleChange = event => {
-        const {name, value} = event.target
+        let name, value
+        if(event.target.name !== 'participants') {
+            name = event.target.name
+            value = event.target.value
+        } else {
+            name = event.target.name
+            value = Array.from(event.target.selectedOptions, option => option.value)
+        }
         setFormData({
             type: 'UPDATE_MEETING',
             payload: { [name]: value },
         })
+
     }
 
     useEffect(() => {
+        console.log(getEvent)
         if(Object.keys(getEvent).length !== 0) {
             setFormData({
                 type: 'UPDATE_MEETING',
@@ -96,7 +108,8 @@ function MeetingForm ({ dateTime, allDay, getEvent, isOpen}){
                     comments: '',
                     _id: '',
                     start: '',
-                    edit: ''
+                    edit: '',
+                    participants: []
                 }
             })
         }
@@ -113,9 +126,8 @@ function MeetingForm ({ dateTime, allDay, getEvent, isOpen}){
     else if(isError) return <div>{error}</div>
 
     const renderParticipantSelect = () => {
-        console.log(participants.data[0].name)
         return participants.data.map(participant => (
-            <option value={participant._id} key={participant._id}>{participant.name}</option>
+            <option id={participant._id} value={participant._id} key={participant._id}>{participant.name}</option>
         ))
     }
 
@@ -142,7 +154,8 @@ function MeetingForm ({ dateTime, allDay, getEvent, isOpen}){
             </div>
             <div>
                 <label>Selecciona participantes</label>
-                <select id="users" name="users" className="selectUsers" multiple>
+                <select id="participants" name="participants" className="selectUsers" multiple onChange={handleChange}
+                    value={ formData.participants || []}>
                     { renderParticipantSelect() }
                 </select>
             </div>

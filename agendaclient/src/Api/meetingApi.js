@@ -3,6 +3,7 @@ import Cookies from 'universal-cookie'
 
 const cookie = new Cookies()
 const token = cookie.get('user')?.token 
+console.log(token)
 const meetingsApi = axios.create({
     baseURL: 'http://localhost:4000/api/schedule',
     headers: {
